@@ -17,9 +17,13 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeSettings;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class FirebaseUIActivity extends AppCompatActivity {
 
@@ -71,6 +75,16 @@ public class FirebaseUIActivity extends AppCompatActivity {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            Log.d(TAG, "Sign-in successful for user: "+ Objects.requireNonNull(user).getEmail());
+            if (user.getMetadata().getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp())
+            {
+                Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
+            }
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             this.finish();
