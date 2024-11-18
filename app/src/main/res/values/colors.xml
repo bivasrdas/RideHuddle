@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Basic Colors -->
+    <color name="darkGray">#474444</color>
+    <color name="buttonColor">#2BB3D5</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="blue">#0000FF</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="cyan">#00FFFF</color>
+    <color name="magenta">#FF00FF</color>
+    <color name="gray">#808080</color>
+    <color name="light_gray">#D3D3D3</color>
+    <color name="dark_gray">#A9A9A9</color>
+    <color name="orange">#FFA500</color>
+    <color name="purple">#800080</color>
+    <color name="brown">#A52A2A</color>
+    <color name="pink">#FFC0CB</color>
+    <color name="lime">#00FF00</color>
+    <color name="teal">#008080</color>
+    <color name="navy">#000080</color>
+    <color name="olive">#808000</color>
+    <color name="maroon">#800000</color>
+
+    <!-- Additional Colors for UI Design -->
+    <color name="primaryColor">#6200EE</color>
+    <color name="primaryDarkColor">#3700B3</color>
+    <color name="accentColor">#03DAC5</color>
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="errorColor">#B00020</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="dividerColor">#BDBDBD</color>
+
+    <!-- Transparent Colors -->
+
+    <color name="transparent">#00000000</color>
+    <color name="semi_transparent">#80000000</color>
+    <color name="semi_transparent_white">#80FFFFFF</color>
+    <color name="semi_transparent_black">#80000000</color>
+
+    <!-- Light Theme Colors -->
+
+    <color name="lightPrimary">#BB86FC</color>
+    <color name="lightSecondary">#03DAC5</color>
+    <color name="lightBackground">#FFFFFF</color>
+    <color name="lightSurface">#FFFFFF</color>
+    <color name="lightError">#CF6679</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="darkPrimary">#3700B3</color>
+    <color name="darkSecondary">#03DAC5</color>
+    <color name="darkBackground">#121212</color>
+    <color name="darkSurface">#121212</color>
+    <color name="darkError">#CF6679</color>
+    <color name="iconColor">#000000</color>
+</resources>

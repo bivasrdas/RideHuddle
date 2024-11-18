@@ -1,0 +1,35 @@
+{
+  "origin": {
+    "vehicleStopover": false,
+    "sideOfRoad": false,
+    "location": {
+      "latLng": {
+        "latitude": "13.0491318",
+        "longitude": "77.59713769999999"
+      }
+    }
+  },
+  "destination": {
+    "vehicleStopover": false,
+    "sideOfRoad": false,
+    "location": {
+      "latLng": {
+        "latitude": "13.0370333",
+        "longitude": "77.5939513"
+      }
+    }
+  },
+  "travelMode": "drive",
+  "routingPreference": "traffic_aware",
+  "polylineQuality": "high_quality",
+  "computeAlternativeRoutes": false,
+  "routeModifiers": {
+    "avoidTolls": false,
+    "avoidHighways": false,
+    "avoidFerries": false,
+    "avoidIndoor": false
+  },
+  "extraComputations": [
+    "TRAFFIC_ON_POLYLINE"
+  ]
+}

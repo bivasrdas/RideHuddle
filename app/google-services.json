@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1654221207",
+    "project_id": "ridehubbledb",
+    "storage_bucket": "ridehubbledb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1654221207:android:a2df4f25b28ec88e76fcd2",
+        "android_client_info": {
+          "package_name": "com.example.ridehuddle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1654221207-k7gcqb40g31i9bvrun791c1n1v7c7oa7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ridehuddle",
+            "certificate_hash": "ac39b3a65f4accb91aec0750a627d6caff376cce"
+          }
+        },
+        {
+          "client_id": "1654221207-6l9s9fqi0dcq8m0boeculg5k090m71kh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxKB11Qo3JH9i0DAdTzWLxpY-nVVMnuWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1654221207-6l9s9fqi0dcq8m0boeculg5k090m71kh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
