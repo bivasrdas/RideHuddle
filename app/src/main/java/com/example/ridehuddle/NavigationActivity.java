@@ -32,6 +32,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     private GoogleMap googleMap;
 
+    UserLocations userLocations;
 
     @SuppressLint("CutPasteId")
     @Override
@@ -40,6 +41,7 @@ public class NavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nav_view);
 
         // Initialize the NavigationView
+        userLocations = new UserLocations(this);
         navigationView = findViewById(R.id.navigation_view);
         navigationView.onCreate(savedInstanceState);
         String destinationPlaceId = getIntent().getStringExtra("destinationLocation");
@@ -55,26 +57,17 @@ public class NavigationActivity extends AppCompatActivity {
                 public void onNavigatorReady(@NonNull Navigator mnavigator) {
                     navigator = mnavigator;
                     navigationView.setNavigationUiEnabled(true);
-                    if (ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
+                    if (userLocations.checkLocationPermission()) {
+                        userLocations.enableLocationPermissions();
                         return;
                     }
-                    navigationView.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(GoogleMap googleMap) {
-                            // Add a marker at a specific location
-                            LatLng markerLocation = new LatLng(37.7749, -122.4194); // Example coordinates (San Francisco)
-                            addMarkerOnMap(markerLocation, "Your Marker",googleMap);
+                    navigationView.getMapAsync(googleMap -> {
+                        // Add a marker at a specific location
+                        LatLng markerLocation = new LatLng(37.7749, -122.4194); // Example coordinates (San Francisco)
+                        addMarkerOnMap(markerLocation, "Your Marker",googleMap);
 
-                            // Optionally move the camera to focus on the marker
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 15));
-                        }
+                        // Optionally move the camera to focus on the marker
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 15));
                     });
 
                     navigationView.getMapAsync(googleMap -> googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED));

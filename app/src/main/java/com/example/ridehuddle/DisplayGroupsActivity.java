@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,32 +33,38 @@ public class DisplayGroupsActivity extends AppCompatActivity implements Recycler
     private static final String TAG = "DisplayGroupsActivity";
 
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_groups);
-        floatingActionButton = findViewById(R.id.floatingActionButton);
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        groupList = new ArrayList<>();
-        groupList.add(new Group("1","Daniel Maas"));
-        groupList.add(new Group("2","Lee"));
-        groupList.add(new Group("3","Marty Reyes"));
-        groupList.add(new Group("4","Sam"));
-        groupList.add(new Group("1","Daniel Maas"));
-        groupList.add(new Group("2","Lee"));
-        groupList.add(new Group("3","Marty Reyes"));
-        groupList.add(new Group("4","Sam"));
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_display_groups);
+            floatingActionButton = findViewById(R.id.floatingActionButton);
+            recyclerView = findViewById(R.id.recyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            groupList = new ArrayList<>();
+            groupList.add(new Group("1","Daniel Maas"));
+            groupList.add(new Group("2","Lee"));
+            groupList.add(new Group("3","Marty Reyes"));
+            groupList.add(new Group("4","Sam"));
+            groupList.add(new Group("1","Daniel Maas"));
+            groupList.add(new Group("2","Lee"));
+            groupList.add(new Group("3","Marty Reyes"));
+            groupList.add(new Group("4","Sam"));
 
-        groupAdapter = new GroupAdapter(this, groupList, this);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-        recyclerView.setAdapter(groupAdapter);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DisplayGroupsActivity.this, DisplayUsersActivity.class);
-                startActivity(intent);
-            }
-        });
+            groupAdapter = new GroupAdapter(this, groupList, this);
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+            recyclerView.setAdapter(groupAdapter);
+            floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(DisplayGroupsActivity.this, DisplayUsersActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while creating display groups activity",e);
+        }
     }
 
     Group deletedGroup = null;
@@ -98,15 +105,22 @@ public class DisplayGroupsActivity extends AppCompatActivity implements Recycler
 
     @Override
     public void onItemClick(int position) {
-        Intent useractivity = new Intent(DisplayGroupsActivity.this, DisplayGroupDetailsActivity.class);
-        startActivity(useractivity);
+        try {
+            Intent useractivity = new Intent(DisplayGroupsActivity.this, DisplayGroupDetailsActivity.class);
+            startActivity(useractivity);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while selecting group",e);
+        }
     }
 
     @Override
     public void onLongItemClick(int position) {
+        //To Edit Group Details
 //        groupList.remove(position);
 //        groupAdapter.notifyItemRemoved(position);
-        Intent useractivity = new Intent(DisplayGroupsActivity.this, DisplayUsersActivity.class);
-        startActivity(useractivity);
+//        Intent useractivity = new Intent(DisplayGroupsActivity.this, DisplayUsersActivity.class);
+//        startActivity(useractivity);
     }
 }
