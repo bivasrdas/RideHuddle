@@ -96,6 +96,7 @@ public class Routes extends AppCompatActivity {
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (response.isSuccessful() && response.body() != null) {
                         String jsonResponse = response.body().string();
+                        Log.d(TAG,jsonResponse);
                         mainHandler.post(() -> handleRouteResponse(jsonResponse));
                     }
                 }
@@ -143,6 +144,8 @@ public class Routes extends AppCompatActivity {
 
     private void addTrafficSegment(JSONObject trafficSegment, List<LatLng> decodedPath) throws JSONException {
         try {
+            Log.d(TAG,trafficSegment.toString());
+            Log.d(TAG,decodedPath.size()+"");
             int startIndex = trafficSegment.getInt("startPolylinePointIndex");
             int endIndex = trafficSegment.getInt("endPolylinePointIndex");
             String speed = trafficSegment.getString("speed");
@@ -152,14 +155,14 @@ public class Routes extends AppCompatActivity {
                     .geodesic(true)
                     .color(getColorForSpeed(speed));
 
-            for (int i = startIndex; i <= endIndex; i++) {
+            for (int i = startIndex; i <= endIndex && i <decodedPath.size(); i++) {
                 polylineOptions.add(decodedPath.get(i));
             }
 
             Polyline polyline = googleMap.addPolyline(polylineOptions);
             polylineList.add(polyline);
         } catch (Exception e) {
-            Log.e(TAG, "Error adding traffic segment", e);
+            Log.d(TAG, "Error adding traffic segment", e);
         }
     }
 

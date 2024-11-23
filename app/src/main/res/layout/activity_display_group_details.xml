@@ -15,7 +15,7 @@
 
         <!-- TextView taking 70% of the width -->
         <TextView
-            android:id="@+id/headerTitle"
+            android:id="@+id/groupNameHeader"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/group"

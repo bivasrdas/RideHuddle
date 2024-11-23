@@ -57,10 +57,6 @@ public class NavigationActivity extends AppCompatActivity {
                 public void onNavigatorReady(@NonNull Navigator mnavigator) {
                     navigator = mnavigator;
                     navigationView.setNavigationUiEnabled(true);
-                    if (userLocations.checkLocationPermission()) {
-                        userLocations.enableLocationPermissions();
-                        return;
-                    }
                     navigationView.getMapAsync(googleMap -> {
                         // Add a marker at a specific location
                         LatLng markerLocation = new LatLng(37.7749, -122.4194); // Example coordinates (San Francisco)
@@ -70,6 +66,9 @@ public class NavigationActivity extends AppCompatActivity {
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 15));
                     });
 
+                    if (ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        userLocations.enableLocationPermissions();
+                    }
                     navigationView.getMapAsync(googleMap -> googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED));
                     navigator.startGuidance();
 

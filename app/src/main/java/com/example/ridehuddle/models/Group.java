@@ -1,88 +1,119 @@
 package com.example.ridehuddle.models;
+import android.util.Log;
 
-import java.util.HashSet;
-import java.util.Set;
+import androidx.annotation.NonNull;
 
-public class Group {
-    private String id;
-    private String name;
-    private Set<User> users;
+import com.example.ridehuddle.MyApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-    private boolean isSelected;
-    public boolean isSelected() {
-        return isSelected;
-    }
+import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+public class Group implements Serializable {
+    private String groupId;
+    private String groupName;
 
+    private String groupIconURL;
+
+    private List<String> userIds;
 
 
     // Constructor
-    public Group(String groupId, String groupName) {
-        this.id = groupId;
-        this.name = groupName;
-        this.users = new HashSet<>();
+    public Group()
+    {
+
+    }
+    public Group(String groupName,String iconURL) {
+        this.groupId = UUID.randomUUID().toString();
+        this.groupName = groupName;
+        this.groupIconURL = iconURL;
+    }
+    public Group(String groupName, String groupId, String groupIconURL, List<String> users) {
+        this.groupId = groupId;
+        this.groupName = groupName;
+        this.groupIconURL = groupIconURL;
+        this.userIds = users;
     }
 
     // Getters and Setters
-    public String getId() {
-        return id;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
-    public String getName() {
-        return name;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public String getGroupIconURL() {
+        return groupIconURL;
     }
 
-    public void addUser(User user) {
-        if (user != null && !users.contains(user)) {
-            users.add(user);
+    public void setGroupIconURL(String groupIconURL) {
+        this.groupIconURL = groupIconURL;
+    }
+    public List<String> getUserIds() {
+        return userIds;
+    }
+
+    public void setUserIds(List<String> userIds) {
+        this.userIds = userIds;
+    }
+
+    public void createGroup()
+    {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("group").document(this.groupId).set(this).addOnSuccessListener(aVoid -> {
+            Log.d("Group", "DocumentSnapshot successfully written!");
+        }).addOnFailureListener(e -> {
+            Log.e("Group", "Error writing document", e);
+        });
+    }
+    public void deleteGroup() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("group").document(this.getGroupId()).delete()
+                .addOnSuccessListener(unused -> Log.d("Group", "Group deleted from DB"))
+                .addOnFailureListener(e -> Log.e("Group", "Error while deleting group", e));
+    }
+    public boolean checkUserPresentInGroup(String userId)
+    {
+        return this.userIds.contains(userId);
+    }
+
+    public void addUserToGroup(String userId) {
+        if(!(this.userIds.contains(userId)))
+        {
+          this.userIds.add(userId);
         }
     }
-
-    public void removeUser(User user) {
-        if (user != null && users.contains(user)) {
-            users.remove(user);
-        }
+    public void updateUserFromGroup() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("group").document(this.groupId).update("userIds", this.userIds).addOnSuccessListener(
+                aVoid -> Log.d("Group", "DocumentSnapshot successfully written!")
+        ).addOnFailureListener(
+                e -> Log.e("Group", "Error writing document", e)
+        );
+    }
+    public void removeUserfromGroup()
+    {
+        this.userIds.remove(MyApp.getInstance().getUserId());
     }
 
     @Override
     public String toString() {
-        return "Group{" + "groupId='" + id + "', groupName='" + name + "'}";
+        return "Group{" +
+                "groupId='" + groupId + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", groupIconURL='" + groupIconURL + '\'' +
+                ", userIds=" + userIds +
+                '}';
     }
 }
-
-//public class Group {
-//    private String name;
-//    private boolean isSelected;
-//
-//    public Group(String name, boolean isSelected) {
-//        this.name = name;
-//        this.isSelected = isSelected;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public boolean isSelected() {
-//        return isSelected;
-//    }
-//
-//    public void setSelected(boolean selected) {
-//        isSelected = selected;
-//    }
-//}

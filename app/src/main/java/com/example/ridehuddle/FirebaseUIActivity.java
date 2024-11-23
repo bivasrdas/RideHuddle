@@ -1,6 +1,7 @@
 package com.example.ridehuddle;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -10,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.ridehuddle.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
@@ -19,6 +21,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +45,6 @@ public class FirebaseUIActivity extends AppCompatActivity {
                 }
             }
     );
-    // [END auth_fui_create_launcher]
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,58 +54,58 @@ public class FirebaseUIActivity extends AppCompatActivity {
     }
 
     public void createSignInIntent() {
-        // [START auth_fui_create_intent]
-        // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build());
 
-        // Create and launch sign-in intent
         Intent signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setIsSmartLockEnabled(false)
-                .setLogo(R.drawable.my_great_logo)
+                .setLogo(R.drawable.ridehubble2)
                 .setTheme(R.style.Theme_RideHuddle)
                 .build();
-
         signInLauncher.launch(signInIntent);
-
-        // [END auth_fui_create_intent]
     }
 
-    // [START auth_fui_result]
-    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
-        IdpResponse response = result.getIdpResponse();
-        if (result.getResultCode() == RESULT_OK) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            Log.d(TAG, "Sign-in successful for user: "+ Objects.requireNonNull(user).getEmail());
-            if (user.getMetadata().getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp())
-            {
-                Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
-            }
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            this.finish();
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-            if (response == null)
-            {
-                Log.d(TAG, "onSignInResult: the user canceled the sign in flow");
+    private void onSignInResult(FirebaseAuthUIAuthenticationResult result)
+    {
+        try {
+            IdpResponse response = result.getIdpResponse();
+            if (result.getResultCode() == RESULT_OK) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user != null)
+                {
+                    Log.d(TAG, "Sign-in successful for user: "+ Objects.requireNonNull(user).getEmail());
+                    if (Objects.requireNonNull(user.getMetadata()).getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp())
+                    {
+                        createUserInDB();
+                        Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
+                    }
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
+                    this.finish();
+                }
             }
             else {
-                Log.d(TAG, "Sign-in error: ", response.getError());
+                if (response == null)
+                {
+                    Log.d(TAG, "onSignInResult: the user canceled the sign in flow");
+                }
+                else {
+                    Log.d(TAG, "Sign-in error: ", response.getError());
+                }
             }
         }
+        catch (Exception e)
+        {
+            Log.d(TAG, "Sign-in error: ", e);
+        }
     }
-    // [END auth_fui_result]
 
     public void signOut() {
         // [START auth_fui_signout]
@@ -202,5 +205,35 @@ public class FirebaseUIActivity extends AppCompatActivity {
             }
         }
         // [END auth_fui_email_link_catch]
+    }
+
+    public void createUserInDB()
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null) {
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+            firestore.collection("user").document(user.getUid()).get().addOnSuccessListener(
+                    documentSnapshot -> {
+                        Log.d(TAG, "User from DB" + documentSnapshot.getData());
+                        if(documentSnapshot.getData() == null)
+                        {
+                            Uri getPhotoUrl = user.getPhotoUrl();
+                            String photoUrl = getPhotoUrl==null?"":getPhotoUrl.toString();
+                            User newUser = new User(user.getUid(), user.getDisplayName(), photoUrl, new GeoPoint(1,1), null);
+                            firestore.collection("user").document(newUser.getUserId()).set(newUser)
+                                    .addOnSuccessListener(
+                                    aVoid -> Log.d(TAG, "User successfully written to DB"))
+                                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+                            }
+                        else
+                        {
+                            Log.d(TAG, "User already exists in DB");
+                        }
+                    }
+            ).addOnFailureListener(e -> {
+                Log.d(TAG, "Error getting user from DB", e);
+
+            });
+        }
     }
 }

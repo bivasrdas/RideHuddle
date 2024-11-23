@@ -35,7 +35,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public void onBindViewHolder(@NonNull UserAdapter.UserViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.userName.setText(user.getName());
+        holder.userName.setText(user.getUserName());
 
         if (user.isSelected()) {
             holder.addIcon.setVisibility(View.GONE);

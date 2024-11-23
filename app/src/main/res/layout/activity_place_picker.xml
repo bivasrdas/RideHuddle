@@ -23,5 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+        android:background="@color/iconColor"
+        android:color="@color/iconColor"
+        android:theme="@style/Theme.RideHuddle"
         />
 </FrameLayout>

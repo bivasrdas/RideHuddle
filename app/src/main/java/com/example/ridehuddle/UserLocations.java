@@ -82,7 +82,7 @@ public class UserLocations extends AppCompatActivity {
 
     protected void enableUserLocation(GoogleMap googleMap, View mapView){
         try {
-            if (checkLocationPermission()) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 enableLocationPermissions();
                 return;
             }
@@ -102,7 +102,7 @@ public class UserLocations extends AppCompatActivity {
     protected void zoomToUserLocation(GoogleMap googleMap)
     {
         try {
-            if (checkLocationPermission()) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 enableLocationPermissions();
             }
             Task<Location> locationTask = fusedLocationClient.getLastLocation();
@@ -124,7 +124,7 @@ public class UserLocations extends AppCompatActivity {
     protected void setUpdateUserLocation()
     {
         try {
-            if (checkLocationPermission()) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 enableLocationPermissions();
             }
             Task<Location> locationTask = fusedLocationClient.getLastLocation();
@@ -151,17 +151,6 @@ public class UserLocations extends AppCompatActivity {
             return "";
         }
     }
-    protected boolean checkLocationPermission()
-    {
-        try {
-            return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG,"Exception while checking location permission",e);
-        }
-        return false;
-    }
 
     protected void zoomToLocation(Location lastLocation, GoogleMap googleMap)
     {
@@ -172,6 +161,18 @@ public class UserLocations extends AppCompatActivity {
         catch (Exception e)
         {
             Log.e(TAG,"Exception while zooming to location",e);
+        }
+    }
+    public LatLng StringLatLng(String location)
+    {
+        try {
+            String[] latLng = location.split(",");
+            return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while converting string to latlng",e);
+            return null;
         }
     }
 }

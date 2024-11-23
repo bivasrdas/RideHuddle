@@ -3,13 +3,16 @@ package com.example.ridehuddle;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ridehuddle.models.Group;
 import com.example.ridehuddle.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,36 +20,50 @@ import java.util.List;
 public class DisplayGroupDetailsActivity extends AppCompatActivity {
     private static final String TAG = "DisplayGroupDetailsActivity";
     private RecyclerView recyclerView;
-    private GroupDetailsAdapter groupDetailsAdapter;
-
-    private FloatingActionButton floatingAddUserButton;
-    private FloatingActionButton floatingMapButton;
-    private List<User> userList;
+    private UserDetailsAdapter userDetailsAdapter;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_display_group_details);
-            floatingAddUserButton = findViewById(R.id.floatingAddUser);
-            floatingMapButton = findViewById(R.id.floatingMapButton);
+            Group group = (Group) getIntent().getSerializableExtra("group");
+            FloatingActionButton floatingAddUserButton = findViewById(R.id.floatingAddUser);
+            FloatingActionButton floatingMapButton = findViewById(R.id.floatingMapButton);
+            TextView groupHeader = findViewById(R.id.groupNameHeader);
             recyclerView = findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-            userList = new ArrayList<>();
-            userList.add(new User("1","Daniel Maas", false));
-            userList.add(new User("2","Lee", false));
-            userList.add(new User("3","Marty Reyes", false));
-            userList.add(new User("4","Sam", true));
-
-            groupDetailsAdapter = new GroupDetailsAdapter(this,userList);
-            recyclerView.setAdapter(groupDetailsAdapter);
+            if(group != null)
+            {
+                groupHeader.setText(group.getGroupName());
+                List<String> groupUserIds = group.getUserIds();
+                List<User> userList = new ArrayList<>();
+                for(String userId : groupUserIds)
+                {
+                    db.collection("user").document(userId)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                User user = documentSnapshot.toObject(User.class);
+                                Log.d(TAG, "User: " + documentSnapshot.getData());
+                                if(user != null) {
+                                    userList.add(user);
+                                }
+                                userDetailsAdapter = new UserDetailsAdapter(this, userList);
+                                recyclerView.setAdapter(userDetailsAdapter);
+                            }).addOnFailureListener(
+                                    e -> Log.e(TAG,"Exception while creating display group details activity",e)
+                            );
+                }
+            }
             floatingAddUserButton.setOnClickListener(v -> {
-                Intent useractivity = new Intent(DisplayGroupDetailsActivity.this, DisplayUsersActivity.class);
-                startActivity(useractivity);
+                Intent userActivity = new Intent(DisplayGroupDetailsActivity.this, DisplayUsersActivity.class);
+                userActivity.putExtra("group",group);
+                startActivity(userActivity);
             });
             floatingMapButton.setOnClickListener(v -> {
-                Intent mapactivity = new Intent(DisplayGroupDetailsActivity.this, DisplayMap.class);
-                startActivity(mapactivity);
+                Intent mapActivity = new Intent(DisplayGroupDetailsActivity.this, DisplayMap.class);
+                mapActivity.putExtra("group",group);
+                startActivity(mapActivity);
             });
         }
         catch (Exception e)

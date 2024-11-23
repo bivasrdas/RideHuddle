@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ridehuddle.models.Group;
-import com.example.ridehuddle.models.User;
 
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
         Group group = groupList.get(position);
-        holder.groupName.setText(group.getName());
+        holder.groupName.setText(group.getGroupName());
     }
 
     @Override

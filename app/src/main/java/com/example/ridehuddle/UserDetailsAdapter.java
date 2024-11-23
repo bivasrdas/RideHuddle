@@ -14,11 +14,11 @@ import com.example.ridehuddle.models.User;
 
 import java.util.List;
 
-public class GroupDetailsAdapter extends RecyclerView.Adapter<GroupDetailsAdapter.GroupDetailsViewHolder> {
+public class UserDetailsAdapter extends RecyclerView.Adapter<UserDetailsAdapter.GroupDetailsViewHolder> {
     private List<User> userList;
     private Context context;
 
-    public GroupDetailsAdapter(Context context, List<User> userList)
+    public UserDetailsAdapter(Context context, List<User> userList)
     {
         this.context = context;
         this.userList = userList;
@@ -28,14 +28,14 @@ public class GroupDetailsAdapter extends RecyclerView.Adapter<GroupDetailsAdapte
     @Override
     public GroupDetailsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_user_no_action, parent, false);
-        return new GroupDetailsAdapter.GroupDetailsViewHolder(view);
+        return new UserDetailsAdapter.GroupDetailsViewHolder(view);
 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GroupDetailsAdapter.GroupDetailsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserDetailsAdapter.GroupDetailsViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.userName.setText(user.getName());
+        holder.userName.setText(user.getUserName());
     }
 
     @Override
