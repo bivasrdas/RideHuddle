@@ -6,6 +6,8 @@ public class MyApp extends Application {
     private static MyApp instance;
     private String userId;
 
+    private String groupId;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -22,6 +24,14 @@ public class MyApp extends Application {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }
 

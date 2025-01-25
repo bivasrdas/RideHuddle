@@ -11,6 +11,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.ridehuddle.models.FireStore;
+import com.example.ridehuddle.models.FirestoreCallback;
+import com.example.ridehuddle.models.Group;
 import com.example.ridehuddle.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -24,9 +27,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class FirebaseUIActivity extends AppCompatActivity {
@@ -76,16 +82,28 @@ public class FirebaseUIActivity extends AppCompatActivity {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if(user != null)
                 {
-                    Log.d(TAG, "Sign-in successful for user: "+ Objects.requireNonNull(user).getEmail());
-                    if (Objects.requireNonNull(user.getMetadata()).getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp())
-                    {
-                        createUserInDB();
-                        Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
-                        Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
-                    }
+                    createUserInDB();
+//                    Log.d(TAG, "Sign-in successful for user: "+ Objects.requireNonNull(user).getEmail());
+//                    long userLoginTime = user.getMetadata().getLastSignInTimestamp();
+//                    long userCreationTime = user.getMetadata().getCreationTimestamp();
+//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+//
+//                    String loginTimeReadable = dateFormat.format(new Date(userLoginTime));
+//                    String creationTimeReadable = dateFormat.format(new Date(userCreationTime));
+//
+//                    // Log or display the results
+//                    Log.d("UserInfo", "User login time: " + loginTimeReadable);
+//                    Log.d("UserInfo", "User creation time: " + creationTimeReadable);
+//                    long usercreationtime = user.getMetadata().getCreationTimestamp();
+//                    if (Objects.requireNonNull(user.getMetadata()).getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp())
+//                    {
+//                        createUserInDB();
+//                        Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
+//                    }
+//                    else
+//                    {
+//                        Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
+//                    }
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     this.finish();
@@ -209,31 +227,61 @@ public class FirebaseUIActivity extends AppCompatActivity {
 
     public void createUserInDB()
     {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null) {
-            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            firestore.collection("user").document(user.getUid()).get().addOnSuccessListener(
-                    documentSnapshot -> {
-                        Log.d(TAG, "User from DB" + documentSnapshot.getData());
-                        if(documentSnapshot.getData() == null)
-                        {
-                            Uri getPhotoUrl = user.getPhotoUrl();
-                            String photoUrl = getPhotoUrl==null?"":getPhotoUrl.toString();
-                            User newUser = new User(user.getUid(), user.getDisplayName(), photoUrl, new GeoPoint(1,1), null);
-                            firestore.collection("user").document(newUser.getUserId()).set(newUser)
-                                    .addOnSuccessListener(
-                                    aVoid -> Log.d(TAG, "User successfully written to DB"))
-                                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+        FirebaseUser firebaseUseruser = FirebaseAuth.getInstance().getCurrentUser();
+        if(firebaseUseruser != null) {
+            FireStore fireStore = new FireStore();
+            {
+                fireStore.getDocument("user", firebaseUseruser.getUid(),User.class,user -> {
+                            if(user ==null)
+                            {   Uri getPhotoUrl = firebaseUseruser.getPhotoUrl();
+                                String photoUrl = getPhotoUrl==null?"":getPhotoUrl.toString();
+                                User newUser = new User(firebaseUseruser.getUid(), firebaseUseruser.getDisplayName(), photoUrl, new GeoPoint(1,1), null);
+                                fireStore.addDocument("user",newUser.getUserId(),newUser,result ->
+                                {
+                                    if(result)
+                                    {
+                                        Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "User successfully written to DB");
+                                    }
+                                    else
+                                    {
+                                        Toast.makeText(this, "Error writing document", Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "Error writing document");
+                                    }
+                                });
                             }
-                        else
-                        {
-                            Log.d(TAG, "User already exists in DB");
+                            else
+                            {
+                                Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "User already exists in DB : "+user.getUserName());
+                            }
                         }
-                    }
-            ).addOnFailureListener(e -> {
-                Log.d(TAG, "Error getting user from DB", e);
-
-            });
+                );
+            }
+//            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//            firestore.collection("user").document(user.getUid()).get().addOnSuccessListener(
+//                    documentSnapshot -> {
+//                        if(documentSnapshot.exists())
+//                        {
+//                            Toast.makeText(this, "Welcome Back", Toast.LENGTH_SHORT).show();
+//                            Log.d(TAG, "User already exists in DB : "+documentSnapshot.getData());
+//                        }
+//                        else
+//                        {
+//                            Uri getPhotoUrl = user.getPhotoUrl();
+//                            String photoUrl = getPhotoUrl==null?"":getPhotoUrl.toString();
+//                            User newUser = new User(user.getUid(), user.getDisplayName(), photoUrl, new GeoPoint(1,1), null);
+//                            firestore.collection("user").document(newUser.getUserId()).set(newUser)
+//                                    .addOnSuccessListener(
+//                                            aVoid -> Log.d(TAG, "User successfully written to DB"))
+//                                    .addOnFailureListener(
+//                                            e -> Log.w(TAG, "Error writing document", e));
+//                            Toast.makeText(this, "Welcome New User", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//            ).addOnFailureListener(e -> {
+//                Log.d(TAG, "Error getting user from DB", e);
+//            });
         }
     }
 }

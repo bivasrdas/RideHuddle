@@ -26,64 +26,26 @@
         android:background="@drawable/rounded_edittext_background"
         android:elevation="4dp"
         android:layout_margin="16dp">
-
-        <!-- Input Box for Starting Location -->
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="0dp"-->
-<!--            android:gravity="center_vertical"-->
-<!--            android:background="@drawable/rounded_edittext_background">-->
-
-<!--            <ImageView-->
-<!--                android:layout_width="24dp"-->
-<!--                android:layout_height="24dp"-->
-<!--                android:src="@drawable/ic_location_your"-->
-<!--                android:contentDescription="@string/your_location" />-->
-<!--            <EditText-->
-<!--                android:id="@+id/start_location"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:hint="@string/your_location"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:background="@android:color/transparent"-->
-<!--                android:textColor="@color/white"-->
-<!--                android:textColorHint="@color/white"-->
-<!--                android:focusable="false"-->
-<!--                android:focusableInTouchMode="false"-->
-<!--                android:padding="8dp"-->
-<!--                android:textSize="16sp" />-->
-<!--        </LinearLayout>-->
-
-        <!-- Divider -->
-<!--        <View-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="1dp"-->
-<!--            android:background="@color/dividerColor"-->
-<!--            android:layout_marginVertical="1dp" />-->
-
-        <!-- Input Box for Destination -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="0dp"
             android:gravity="center_vertical"
             android:background="@drawable/rounded_edittext_background">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:src="@drawable/baseline_location_pin_24"
                 android:contentDescription="@string/destination_location" />
 
             <EditText
                 android:id="@+id/destination_location"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="8"
                 android:hint="@string/destination_location"
-                android:layout_marginStart="8dp"
                 android:background="@android:color/transparent"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
@@ -91,8 +53,33 @@
                 android:focusableInTouchMode="false"
                 android:padding="8dp"
                 android:textSize="16sp" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+
+                <!-- Button for Clickable Area -->
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/circular_button"
+                    android:contentDescription="@string/user_profile_button"
+                    android:padding="0dp" />
+
+                <!-- ImageView for the Icon -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/baseline_user_24"
+                    android:contentDescription="@string/user_profile_icon" />
+            </FrameLayout>
         </LinearLayout>
-<!--        <Button-->
+
+
+        <!--        <Button-->
 <!--            android:id="@+id/btn_find_route"-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="wrap_content"-->
@@ -103,39 +90,36 @@
 <!--            android:padding="8dp"-->
 <!--            android:elevation="4dp"/>-->
     </LinearLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <!-- Button to start navigation -->
-    </RelativeLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_anchor="@+id/map"
+        app:layout_anchorGravity="center">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingMyLocationButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             android:clickable="true"
-            app:srcCompat="@drawable/baseline_my_location_24"
+            android:contentDescription="@string/add_user"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="40dp"
-            android:layout_margin="16dp"
-            android:contentDescription="@string/add_user"/>
+            app:srcCompat="@drawable/baseline_my_location_24" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floatingNavigationButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
-            app:srcCompat="@drawable/nav_notification_icon"
+            android:contentDescription="@string/map_button"
             app:layout_constraintBottom_toTopOf="@id/floatingMyLocationButton"
             app:layout_constraintEnd_toEndOf="@id/floatingMyLocationButton"
             app:maxImageSize="40dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="@string/map_button"/>
+            app:srcCompat="@drawable/nav_notification_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

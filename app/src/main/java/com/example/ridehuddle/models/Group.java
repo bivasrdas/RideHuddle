@@ -1,11 +1,8 @@
 package com.example.ridehuddle.models;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.example.ridehuddle.MyApp;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +14,6 @@ public class Group implements Serializable {
     private String groupIconURL;
 
     private List<String> userIds;
-
 
     // Constructor
     public Group()
@@ -102,11 +98,10 @@ public class Group implements Serializable {
                 e -> Log.e("Group", "Error writing document", e)
         );
     }
-    public void removeUserfromGroup()
+    public void removeUserFromGroup()
     {
         this.userIds.remove(MyApp.getInstance().getUserId());
     }
-
     @Override
     public String toString() {
         return "Group{" +

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.ridehuddle.models.Group;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,15 +34,16 @@ public class NavigationActivity extends AppCompatActivity {
     private GoogleMap googleMap;
 
     UserLocations userLocations;
+    Group group;
 
     @SuppressLint("CutPasteId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_view);
-
+        group = (Group) getIntent().getSerializableExtra("group");
         // Initialize the NavigationView
-        userLocations = new UserLocations(this);
+        userLocations = new UserLocations(this,group);
         navigationView = findViewById(R.id.navigation_view);
         navigationView.onCreate(savedInstanceState);
         String destinationPlaceId = getIntent().getStringExtra("destinationLocation");
@@ -57,19 +59,14 @@ public class NavigationActivity extends AppCompatActivity {
                 public void onNavigatorReady(@NonNull Navigator mnavigator) {
                     navigator = mnavigator;
                     navigationView.setNavigationUiEnabled(true);
-                    navigationView.getMapAsync(googleMap -> {
-                        // Add a marker at a specific location
-                        LatLng markerLocation = new LatLng(37.7749, -122.4194); // Example coordinates (San Francisco)
-                        addMarkerOnMap(markerLocation, "Your Marker",googleMap);
-
-                        // Optionally move the camera to focus on the marker
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(markerLocation, 15));
-                    });
-
                     if (ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(NavigationActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         userLocations.enableLocationPermissions();
                     }
-                    navigationView.getMapAsync(googleMap -> googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED));
+                    navigationView.getMapAsync(googleMap -> {
+                        googleMap.followMyLocation(GoogleMap.CameraPerspective.TILTED);
+                        userLocations.startLocationUpdates();
+                        userLocations.addUsersMarker(group.getUserIds(),googleMap);
+                    });
                     navigator.startGuidance();
 
                     Log.d(TAG, "Navigator is ready");
@@ -148,6 +145,7 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         navigationView.onStop();
+        userLocations.stopLocationUpdates();
         super.onStop();
     }
 

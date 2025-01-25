@@ -71,4 +71,6 @@
     <string name="select_group_icon">Select Group Icon</string>
     <string name="create_new_group">Create New Group</string>
     <string name="group_name">Group Name</string>
+    <string name="user_profile_button">User Profile Button</string>
+    <string name="user_profile_icon">User Profile Icon</string>
 </resources>

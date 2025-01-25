@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -14,13 +15,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.ridehuddle.models.Group;
+import com.example.ridehuddle.models.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserLocations extends AppCompatActivity {
 
@@ -34,13 +49,35 @@ public class UserLocations extends AppCompatActivity {
 
     String startLocation;
     LatLng startLocationLatLng;
+    LocationRequest locationRequest;
+    FirebaseFirestore db;
+    Map<String, Marker> userMarkers;
+    Group group;
 
+    public UserLocations(Context context, Group group) {
+        this.context = context;
+        this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        this.activity = (Activity) context;
+        this.startLocation = "";
+        this.startLocationLatLng = null;
+        this.locationRequest = new LocationRequest.Builder(500)
+                .setMinUpdateIntervalMillis(50)
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
+        this.db = FirebaseFirestore.getInstance();
+        this.userMarkers = new HashMap<>();
+        this.group = group;
+    }
     public UserLocations(Context context) {
         this.context = context;
         this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         this.activity = (Activity) context;
         this.startLocation = "";
         this.startLocationLatLng = null;
+        this.locationRequest = new LocationRequest.Builder(500)
+                .setMinUpdateIntervalMillis(50)
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build();
+        db = FirebaseFirestore.getInstance();
+        userMarkers = new HashMap<>();
     }
 
     @Override
@@ -173,6 +210,89 @@ public class UserLocations extends AppCompatActivity {
         {
             Log.e(TAG,"Exception while converting string to latlng",e);
             return null;
+        }
+    }
+    public void startLocationUpdates(){
+        try {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                this.enableLocationPermissions();
+                return;
+            }
+            fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper());
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while starting location updates",e);
+        }
+    }
+
+    public void stopLocationUpdates(){
+        try {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while stopping location updates",e);
+        }
+    }
+    LocationCallback locationCallback =  new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            updateUsersMarker(locationResult.getLastLocation(),group.getUserIds());
+            Log.d(TAG, "onLocationResult: " + locationResult.getLastLocation());
+        }
+    };
+
+    protected void addUsersMarker(List<String> userIds, GoogleMap googleMap) {
+        try {
+            db.collection("user")
+                    .whereIn("userId", userIds)
+                    .get().addOnSuccessListener(
+                            queryDocumentSnapshots ->{
+                                for(QueryDocumentSnapshot queryDocumentSnapshot: queryDocumentSnapshots)
+                                {
+                                    User user = queryDocumentSnapshot.toObject(User.class);
+                                    LatLng latLng = new LatLng(user.getLocations().getLatitude(),user.getLocations().getLongitude());
+                                    Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title(user.getUserName()));
+                                    userMarkers.put(user.getUserId(),marker);
+                                }
+                            }
+                    ).addOnFailureListener(
+                            e -> Log.e(TAG,"Exception while adding users marker",e)
+                    );
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Exception while adding users marker", e);
+        }
+    }
+    protected void updateUsersMarker(Location lastLocation,List<String> userIds) {
+        try {
+            db.collection("user").document(MyApp.getInstance().getUserId()).update("locations",new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude())).addOnSuccessListener(
+                    unused -> Log.d(TAG,"User location updated")
+            ).addOnFailureListener(
+                    e -> Log.e(TAG,"Exception while updating users location",e)
+            );
+            db.collection("user")
+                    .whereIn("userId", userIds)
+                    .get().addOnSuccessListener(
+                            queryDocumentSnapshots ->{
+                                for(QueryDocumentSnapshot queryDocumentSnapshot: queryDocumentSnapshots)
+                                {
+                                    User user = queryDocumentSnapshot.toObject(User.class);
+                                    LatLng latLng = new LatLng(user.getLocations().getLatitude(),user.getLocations().getLongitude());
+                                    Marker marker = userMarkers.get(user.getUserId());
+                                    if(marker != null)
+                                    {
+                                        marker.setPosition(latLng);
+                                    }
+                                }
+                            }
+                    );
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG,"Exception while updating users location",e);
         }
     }
 }

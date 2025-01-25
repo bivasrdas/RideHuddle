@@ -1,12 +1,7 @@
 package com.example.ridehuddle.models;
+import androidx.annotation.NonNull;
 
-import android.net.Uri;
-
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.GeoPoint;
-
-import java.util.Set;
-
 public class User {
     private String userId;
     private String userName;
@@ -14,7 +9,7 @@ public class User {
     private String userImageUrl;
     private GeoPoint locations;
 
-    private Set<String> groupIds;
+    private String selectedGroupId;
     private boolean isSelected;
 
     // Constructor
@@ -28,12 +23,12 @@ public class User {
         this.userName = name;
         this.isSelected = isSelected;
     }
-    public User(String userId, String userName, String userImageUrl, GeoPoint locations, Set<String> groupIds) {
+    public User(String userId, String userName, String userImageUrl, GeoPoint locations, String selectedGroupId) {
         this.userId = userId;
         this.userName = userName;
         this.userImageUrl = userImageUrl;
         this.locations = locations;
-        this.groupIds = groupIds;
+        this.selectedGroupId = selectedGroupId;
     }
 
     // Getters and Setters
@@ -69,19 +64,12 @@ public class User {
         this.locations = locations;
     }
 
-    public Set<String> getGroupIds() {
-        return groupIds;
+    public String getSelectedGroupId() {
+        return selectedGroupId;
     }
 
-    public void setGroupIds(Set<String> groupIds) {
-        this.groupIds = groupIds;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId='" + userId + "', userName='" + userName +
-                "'}";
+    public void setSelectedGroupId(String selectedGroupId) {
+        this.selectedGroupId = selectedGroupId;
     }
 
     public String getUserImageUrl() {
@@ -90,5 +78,18 @@ public class User {
 
     public void setUserImageUrl(String userImageUrl) {
         this.userImageUrl = userImageUrl;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userImageUrl='" + userImageUrl + '\'' +
+                ", locations=" + locations +
+                ", selectedGroupId='" + selectedGroupId + '\'' +
+                ", isSelected=" + isSelected +
+                '}';
     }
 }
